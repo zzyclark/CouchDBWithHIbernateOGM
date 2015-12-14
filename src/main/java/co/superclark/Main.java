@@ -26,12 +26,18 @@ public class Main {
         //build the EntityManagerFactory as you would build in in Hibernate Core
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "couchdb-hibernateogm" );
 
-        //Persist entities the way you are used to in plain JPA
         try {
+            //start transaction
             tm.begin();
             logger.infof( "About to store dog and breed" );
+
+            /**
+             * Initialize Hibernate OgmSession api from EntityManager, if
+             * you want use plain JPA, just directly use the EntityManger to persist entity
+             */
             EntityManager em = emf.createEntityManager();
             OgmSession ogmSession = em.unwrap(OgmSession.class);
+
             Dog dina = new Dog();
             dina.setName( "Nancy" );
             Breed breed = new Breed();
@@ -44,11 +50,14 @@ public class Main {
             tx.commit();
             ogmSession.close();
 
-            //Retrieve your entities the way you are used to in plain JPA
+            /**
+             * Retrieve your entities the way you are used to in plain JPA,
+             * you can also use OgmSession initialized before to the retrieve
+             */
             logger.infof( "About to retrieve dog and breed" );
             em = emf.createEntityManager();
             dina = em.find( Dog.class, dinaId );
-            System.out.println("Found dog %s of breed %s" + dina.getName() + dina.getBreed().getName());
+            System.out.println("Found dog: " + dina.getName() + " of breed: " + dina.getBreed().getName());
             em.flush();
             em.close();
             tm.commit();
